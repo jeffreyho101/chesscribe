@@ -6,6 +6,7 @@ import {
   buildPgn,
   lichessUrl,
   moveIndexAtPly,
+  moveIndexForNextPly,
   moveSanFromFen,
   normalizeSan,
   pgnMovetext,
@@ -94,6 +95,43 @@ describe('board editing helpers', () => {
   it('builds SAN from a legal board move', () => {
     expect(moveSanFromFen(START_FEN, 'e2', 'e4')).toBe('e4')
     expect(moveSanFromFen(START_FEN, 'e2', 'e5')).toBeNull()
+  })
+
+  it('overwrites an ambiguous move instead of the next populated cell', () => {
+    const moves = [
+      'e4',
+      'e5',
+      'Nf3',
+      'Nc6',
+      'c3',
+      'd5',
+      'Qa4',
+      'dxe4',
+      'Nxe5',
+      'Bd7',
+      'Nxd7',
+      'Qxd7',
+      'Qxe4+',
+      'Be7',
+      'Bb5',
+      'Nf6',
+      'Bxc6',
+      'bxc6',
+      'Qf3',
+      'O-O',
+      'd4',
+      'Re8',
+      'Bd2',
+    ]
+    const analysis = analyzeMoves(moves)
+
+    expect(analysis.results[21].legal).toBe(false)
+    expect(moveIndexForNextPly(analysis, 21)).toBe(21)
+    expect(setMoveAtPly(moves, analysis, 21, 'Rfe8')).toEqual([
+      ...moves.slice(0, 21),
+      'Rfe8',
+      'Bd2',
+    ])
   })
 })
 

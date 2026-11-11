@@ -1,4 +1,5 @@
 import {
+  analyzeMoves,
   moveIndexAtPly,
   setMoveAtPly,
   type Analysis,
@@ -60,6 +61,18 @@ export function ReviewStep({
     } else {
       onPlyChange(Math.max(0, analysis.fens.length - 1))
     }
+  }
+
+  function handleMoveChange(index: number, value: string) {
+    const next = moves.slice()
+    while (next.length <= index) next.push('')
+    next[index] = value
+
+    const nextAnalysis = analyzeMoves(next)
+    const result = nextAnalysis.results[index]
+
+    onMovesChange(next)
+    if (result) onPlyChange(result.acceptedAfter)
   }
 
   function handleBoardMove(san: string) {
@@ -140,6 +153,7 @@ export function ReviewStep({
         analysis={analysis}
         activeIndex={activeIndex}
         onMovesChange={onMovesChange}
+        onMoveChange={handleMoveChange}
         onSelect={handleSelect}
       />
 

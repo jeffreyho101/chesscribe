@@ -55,22 +55,12 @@ export function moveIndexAtPly(analysis: Analysis, ply: number): number | null {
 }
 
 export function moveIndexForNextPly(analysis: Analysis, ply: number): number {
-  const existing = moveIndexAtPly(analysis, ply + 1)
-  if (existing !== null) return existing
+  if (ply <= 0) return 0
 
-  if (ply <= 0) {
-    const first = analysis.results.findIndex((result) => !result.empty)
-    return first === -1 ? 0 : first
-  }
-
-  let index = 0
-  for (let resultIndex = 0; resultIndex < analysis.results.length; resultIndex++) {
-    const result = analysis.results[resultIndex]
-    if (result.legal && !result.empty && result.acceptedAfter <= ply) {
-      index = resultIndex + 1
-    }
-  }
-  return index
+  const lastAccepted = analysis.results.findIndex(
+    (result) => result.legal && !result.empty && result.acceptedAfter === ply,
+  )
+  return lastAccepted === -1 ? 0 : lastAccepted + 1
 }
 
 export function setMoveAtPly(

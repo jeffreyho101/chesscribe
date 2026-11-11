@@ -5,6 +5,7 @@ interface MoveGridProps {
   analysis: Analysis
   activeIndex: number | null
   onMovesChange: (moves: string[]) => void
+  onMoveChange: (index: number, value: string) => void
   onSelect: (index: number) => void
 }
 
@@ -13,16 +14,10 @@ export function MoveGrid({
   analysis,
   activeIndex,
   onMovesChange,
+  onMoveChange,
   onSelect,
 }: MoveGridProps) {
   const rowCount = Math.max(1, Math.ceil(moves.length / 2))
-
-  function setMove(index: number, value: string) {
-    const next = moves.slice()
-    while (next.length <= index) next.push('')
-    next[index] = value
-    onMovesChange(next)
-  }
 
   return (
     <section className="move-grid-panel" aria-label="Editable moves">
@@ -54,7 +49,7 @@ export function MoveGrid({
                 moves={moves}
                 analysis={analysis}
                 activeIndex={activeIndex}
-                onChange={setMove}
+                onChange={onMoveChange}
                 onSelect={onSelect}
               />
               <MoveCell
@@ -63,7 +58,7 @@ export function MoveGrid({
                 moves={moves}
                 analysis={analysis}
                 activeIndex={activeIndex}
-                onChange={setMove}
+                onChange={onMoveChange}
                 onSelect={onSelect}
               />
             </div>
