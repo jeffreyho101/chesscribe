@@ -62,6 +62,40 @@ describe('analyzeMoves', () => {
     expect(explicit.results[4].legal).toBe(true)
     expect(explicit.results[4].san).toBe('Nbd2')
   })
+
+  it('rejects Ne5 when Nce5 is the correctly disambiguated move', () => {
+    const prefix = [
+      'e4',
+      'c5',
+      'd4',
+      'cxd4',
+      'c3',
+      'dxc3',
+      'Nxc3',
+      'Nc6',
+      'Nf3',
+      'd6',
+      'Bc4',
+      'Nf6',
+      'O-O',
+      'Bg4',
+      'h3',
+      'Bxf3',
+      'Qxf3',
+      'e6',
+      'Rd1',
+      'Qb6',
+      'Bg5',
+      'Nd7',
+      'Rac1',
+    ]
+    const ambiguous = analyzeMoves([...prefix, 'Ne5'])
+    const explicit = analyzeMoves([...prefix, 'Nce5'])
+
+    expect(ambiguous.results[23].legal).toBe(false)
+    expect(explicit.results[23].legal).toBe(true)
+    expect(explicit.results[23].san).toBe('Nce5')
+  })
 })
 
 describe('board editing helpers', () => {
@@ -132,6 +166,77 @@ describe('board editing helpers', () => {
       'Rfe8',
       'Bd2',
     ])
+  })
+})
+
+describe('Marshall 1915 scoresheet', () => {
+  const moves = [
+    'e4',
+    'c5',
+    'd4',
+    'cxd4',
+    'c3',
+    'dxc3',
+    'Nxc3',
+    'Nc6',
+    'Nf3',
+    'd6',
+    'Bc4',
+    'Nf6',
+    'O-O',
+    'Bg4',
+    'h3',
+    'Bxf3',
+    'Qxf3',
+    'e6',
+    'Rd1',
+    'Qb8',
+    'Bg5',
+    'Nd7',
+    'Rac1',
+    'Nce5',
+    'Qe2',
+    'Nxc4',
+    'Qxc4',
+    'h6',
+    'Bh4',
+    'a6',
+    'Qd4',
+    'Qa7',
+    'Qxa7',
+    'Rxa7',
+    'Nb5',
+    'f6',
+    'Nxa7',
+    'Nc5',
+    'f3',
+    'Kf7',
+    'Nc8',
+  ]
+
+  it('replays every move in the corrected PGN', () => {
+    const analysis = analyzeMoves(moves)
+
+    expect(analysis.results.every((result) => result.legal)).toBe(true)
+    expect(analysis.accepted).toEqual(moves)
+    expect(analysis.fens).toHaveLength(moves.length + 1)
+  })
+
+  it('rejects Ne5 at move 12 instead of resolving the ambiguity', () => {
+    const ambiguous = moves.slice()
+    ambiguous[23] = 'Ne5'
+    const analysis = analyzeMoves(ambiguous)
+
+    expect(analysis.results[23].legal).toBe(false)
+  })
+
+  it('builds the corrected PGN movetext', () => {
+    const analysis = analyzeMoves(moves)
+    const pgn = buildPgn(analysis, { ...DEFAULT_DETAILS, result: '1-0' })
+
+    expect(pgnMovetext(pgn)).toBe(
+      '1. e4 c5 2. d4 cxd4 3. c3 dxc3 4. Nxc3 Nc6 5. Nf3 d6 6. Bc4 Nf6 7. O-O Bg4 8. h3 Bxf3 9. Qxf3 e6 10. Rd1 Qb8 11. Bg5 Nd7 12. Rac1 Nce5 13. Qe2 Nxc4 14. Qxc4 h6 15. Bh4 a6 16. Qd4 Qa7 17. Qxa7 Rxa7 18. Nb5 f6 19. Nxa7 Nc5 20. f3 Kf7 21. Nc8 1-0',
+    )
   })
 })
 

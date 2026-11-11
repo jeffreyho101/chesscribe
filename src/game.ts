@@ -113,7 +113,7 @@ export function analyzeMoves(moves: readonly string[]): Analysis {
     }
 
     try {
-      const move = chess.move(san)
+      const move = chess.move(san, { strict: true })
       accepted.push(move.san)
       fens.push(chess.fen())
       results.push({

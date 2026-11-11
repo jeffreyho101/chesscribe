@@ -24,8 +24,9 @@ export function MoveGrid({
       <div className="move-grid-heading">
         <h2>Moves</h2>
         <p className="hint">
-          Red moves are illegal, ambiguous, or could not be parsed. Drag pieces on the
-          board to add or replace the next move.
+          Red moves are illegal, ambiguous, or could not be parsed. Ambiguous notation
+          is not guessed; add the file or rank. Drag pieces on the board to add or
+          replace the next move.
         </p>
       </div>
 
