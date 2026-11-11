@@ -1,7 +1,7 @@
 import { RESULTS, normalizeSan } from './game'
 import type { RecognizeProgress, RecognizeResult } from './ocr'
 
-export const GEMINI_MODEL = 'gemini-2.5-flash'
+export const GEMINI_MODEL = 'gemini-3.5-flash'
 export const GEMINI_ENDPOINT =
   `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
 
