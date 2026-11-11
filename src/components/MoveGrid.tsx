@@ -3,32 +3,31 @@ import type { Analysis } from '../game'
 interface MoveGridProps {
   moves: string[]
   analysis: Analysis
-  selected: number | null
+  activeIndex: number | null
   onMovesChange: (moves: string[]) => void
+  onMoveChange: (index: number, value: string) => void
   onSelect: (index: number) => void
 }
 
 export function MoveGrid({
   moves,
   analysis,
-  selected,
+  activeIndex,
   onMovesChange,
+  onMoveChange,
   onSelect,
 }: MoveGridProps) {
   const rowCount = Math.max(1, Math.ceil(moves.length / 2))
-
-  function setMove(index: number, value: string) {
-    const next = moves.slice()
-    while (next.length <= index) next.push('')
-    next[index] = value
-    onMovesChange(next)
-  }
 
   return (
     <section className="move-grid-panel" aria-label="Editable moves">
       <div className="move-grid-heading">
         <h2>Moves</h2>
-        <p className="hint">Red moves are illegal or could not be parsed.</p>
+        <p className="hint">
+          Red moves are illegal, ambiguous, or could not be parsed. Ambiguous notation
+          is not guessed; add the file or rank. Drag pieces on the board to add or
+          replace the next move.
+        </p>
       </div>
 
       <div className="move-grid">
@@ -50,8 +49,8 @@ export function MoveGrid({
                 label={`White move ${row + 1}`}
                 moves={moves}
                 analysis={analysis}
-                selected={selected}
-                onChange={setMove}
+                activeIndex={activeIndex}
+                onChange={onMoveChange}
                 onSelect={onSelect}
               />
               <MoveCell
@@ -59,8 +58,8 @@ export function MoveGrid({
                 label={`Black move ${row + 1}`}
                 moves={moves}
                 analysis={analysis}
-                selected={selected}
-                onChange={setMove}
+                activeIndex={activeIndex}
+                onChange={onMoveChange}
                 onSelect={onSelect}
               />
             </div>
@@ -94,7 +93,7 @@ interface MoveCellProps {
   label: string
   moves: string[]
   analysis: Analysis
-  selected: number | null
+  activeIndex: number | null
   onChange: (index: number, value: string) => void
   onSelect: (index: number) => void
 }
@@ -104,7 +103,7 @@ function MoveCell({
   label,
   moves,
   analysis,
-  selected,
+  activeIndex,
   onChange,
   onSelect,
 }: MoveCellProps) {
@@ -116,7 +115,7 @@ function MoveCell({
     <input
       type="text"
       className={`move-input${illegal ? ' illegal' : ''}${
-        selected === index ? ' selected' : ''
+        activeIndex === index ? ' active' : ''
       }`}
       value={value}
       aria-label={label}
