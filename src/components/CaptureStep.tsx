@@ -1,10 +1,22 @@
 import { useRef } from 'react'
+import type { OcrEngine } from '../ocr'
+import { OcrSettings } from './OcrSettings'
 
 interface CaptureStepProps {
   onImage: (file: File) => void
+  engine: OcrEngine
+  onEngineChange: (engine: OcrEngine) => void
+  apiKey: string
+  onApiKeyChange: (apiKey: string) => void
 }
 
-export function CaptureStep({ onImage }: CaptureStepProps) {
+export function CaptureStep({
+  onImage,
+  engine,
+  onEngineChange,
+  apiKey,
+  onApiKeyChange,
+}: CaptureStepProps) {
   const cameraRef = useRef<HTMLInputElement>(null)
   const uploadRef = useRef<HTMLInputElement>(null)
 
@@ -19,10 +31,17 @@ export function CaptureStep({ onImage }: CaptureStepProps) {
       <div className="hero">
         <h1>Chesscribe</h1>
         <p className="lede">
-          Photograph a handwritten scoresheet and turn it into a PGN. Everything runs on
-          this device.
+          Photograph a handwritten scoresheet and turn it into a PGN. Use the private
+          on-device model or Gemini cloud OCR.
         </p>
       </div>
+
+      <OcrSettings
+        engine={engine}
+        onEngineChange={onEngineChange}
+        apiKey={apiKey}
+        onApiKeyChange={onApiKeyChange}
+      />
 
       <div className="capture-actions">
         <button
@@ -58,8 +77,8 @@ export function CaptureStep({ onImage }: CaptureStepProps) {
       />
 
       <p className="hint">
-        The photo never leaves your device. The app downloads the recognition model once
-        and caches it in the browser.
+        With the local model, the photo never leaves your device and the model is cached
+        after the first download.
       </p>
     </section>
   )

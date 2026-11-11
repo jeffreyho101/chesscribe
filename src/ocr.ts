@@ -50,6 +50,8 @@ export const MODEL_URL =
 const MODEL_CACHE = 'chesscribe-model-v1'
 const MIN_INK_RATIO = 0.01
 
+export type OcrEngine = 'local' | 'gemini'
+
 export interface RecognizeProgress {
   stage: 'model' | 'grid' | 'cell' | 'done'
   message: string
@@ -57,6 +59,7 @@ export interface RecognizeProgress {
 }
 
 export interface RecognizeResult {
+  engine: OcrEngine
   moves: string[]
   recognized: number
   skipped: number
@@ -371,6 +374,7 @@ export async function recognizeScoresheet(
   onProgress?.({ stage: 'done', message: 'Finished reading the scoresheet.' })
 
   return {
+    engine: 'local',
     moves,
     recognized: moves.length,
     skipped: totalSkipped,
