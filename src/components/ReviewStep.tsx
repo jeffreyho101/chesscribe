@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { Analysis, GameDetails } from '../game'
+import type { OcrEngine } from '../ocr'
 import { BoardPanel } from './BoardPanel'
 import { ExportPanel } from './ExportPanel'
 import { MoveGrid } from './MoveGrid'
+import { OcrSettings } from './OcrSettings'
 
 interface ReviewStepProps {
   analysis: Analysis
@@ -15,6 +17,10 @@ interface ReviewStepProps {
   status: string
   busy: boolean
   error: string | null
+  engine: OcrEngine
+  onEngineChange: (engine: OcrEngine) => void
+  apiKey: string
+  onApiKeyChange: (apiKey: string) => void
   onRetry: () => void
   onDismissError: () => void
   onRecrop: () => void
@@ -32,6 +38,10 @@ export function ReviewStep({
   status,
   busy,
   error,
+  engine,
+  onEngineChange,
+  apiKey,
+  onApiKeyChange,
   onRetry,
   onDismissError,
   onRecrop,
@@ -61,6 +71,14 @@ export function ReviewStep({
           </p>
         </div>
         <div className="toolbar-actions">
+          <button
+            type="button"
+            className="button small"
+            onClick={onRetry}
+            disabled={busy || !moves.length}
+          >
+            Re-run
+          </button>
           <button type="button" className="button small" onClick={onRecrop}>
             Re-crop
           </button>
@@ -91,6 +109,15 @@ export function ReviewStep({
           )}
         </div>
       )}
+
+      <OcrSettings
+        engine={engine}
+        onEngineChange={onEngineChange}
+        apiKey={apiKey}
+        onApiKeyChange={onApiKeyChange}
+        disabled={busy}
+        compact
+      />
 
       <BoardPanel
         fens={analysis.fens}
