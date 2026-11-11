@@ -12,6 +12,7 @@ the result on a live board before exporting.
 - Automatic scoresheet grid detection with manual crop adjustment
 - Selectable OCR engine: private on-device model or Gemini cloud OCR
 - Move-by-move review with a chessboard preview and legal-move validation
+- Drag pieces on the board to add or replace moves and update the PGN live
 - Automatic cleanup of common notation quirks (`0-0`, `:`, spacing)
 - PGN export with optional player names, Elo ratings, and result
 - Copy PGN, download a `.pgn` file, or open the game on Lichess
@@ -22,8 +23,9 @@ the result on a live board before exporting.
 2. **Crop** — the app finds the scoresheet grid; adjust the crop if needed.
 3. **Recognize** — use the local BiLSTM model through `onnxruntime-web`, or send the
    cropped scoresheet to Gemini for cloud OCR.
-4. **Review** — correct any misread moves. Illegal moves are highlighted, and the
-   board follows the selected move.
+4. **Review** — correct any misread moves by typing or by dragging pieces on the
+   board. The current move is highlighted, and illegal or ambiguous moves are marked
+   red with live updates.
 5. **Export** — copy or download the PGN, or send the moves to Lichess analysis.
 
 ## OCR engines

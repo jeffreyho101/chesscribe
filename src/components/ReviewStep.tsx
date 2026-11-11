@@ -1,5 +1,9 @@
-import { useState } from 'react'
-import type { Analysis, GameDetails } from '../game'
+import {
+  moveIndexAtPly,
+  setMoveAtPly,
+  type Analysis,
+  type GameDetails,
+} from '../game'
 import type { OcrEngine } from '../ocr'
 import { BoardPanel } from './BoardPanel'
 import { ExportPanel } from './ExportPanel'
@@ -47,16 +51,20 @@ export function ReviewStep({
   onRecrop,
   onNewPhoto,
 }: ReviewStepProps) {
-  const [selected, setSelected] = useState<number | null>(null)
+  const activeIndex = moveIndexAtPly(analysis, ply)
 
   function handleSelect(index: number) {
-    setSelected(index)
     const result = analysis.results[index]
     if (result) {
       onPlyChange(result.acceptedAfter)
     } else {
       onPlyChange(Math.max(0, analysis.fens.length - 1))
     }
+  }
+
+  function handleBoardMove(san: string) {
+    onMovesChange(setMoveAtPly(moves, analysis, ply, san))
+    onPlyChange(Math.min(ply + 1, analysis.fens.length))
   }
 
   return (
@@ -123,12 +131,14 @@ export function ReviewStep({
         fens={analysis.fens}
         ply={ply}
         onPlyChange={onPlyChange}
+        onMove={handleBoardMove}
+        disabled={busy}
       />
 
       <MoveGrid
         moves={moves}
         analysis={analysis}
-        selected={selected}
+        activeIndex={activeIndex}
         onMovesChange={onMovesChange}
         onSelect={handleSelect}
       />

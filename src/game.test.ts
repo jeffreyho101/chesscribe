@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_DETAILS,
+  START_FEN,
   analyzeMoves,
   buildPgn,
   lichessUrl,
+  moveIndexAtPly,
+  moveSanFromFen,
   normalizeSan,
   pgnMovetext,
+  setMoveAtPly,
   type GameDetails,
 } from './game'
 
@@ -46,6 +50,50 @@ describe('analyzeMoves', () => {
     expect(analysis.results[1].empty).toBe(true)
     expect(analysis.results[1].legal).toBe(true)
     expect(analysis.accepted).toEqual(['e4', 'e5'])
+  })
+
+  it('marks ambiguous moves as illegal', () => {
+    const prefix = ['d4', 'a6', 'Nf3', 'a5']
+    const ambiguous = analyzeMoves([...prefix, 'Nd2'])
+    const explicit = analyzeMoves([...prefix, 'Nbd2'])
+
+    expect(ambiguous.results[4].legal).toBe(false)
+    expect(explicit.results[4].legal).toBe(true)
+    expect(explicit.results[4].san).toBe('Nbd2')
+  })
+})
+
+describe('board editing helpers', () => {
+  it('maps a ply to the move that produced it', () => {
+    const analysis = analyzeMoves(['e4', 'e5', 'Nf3'])
+
+    expect(moveIndexAtPly(analysis, 0)).toBeNull()
+    expect(moveIndexAtPly(analysis, 1)).toBe(0)
+    expect(moveIndexAtPly(analysis, 3)).toBe(2)
+  })
+
+  it('replaces the next move without dropping later moves', () => {
+    const moves = ['e4', 'e5', 'Nf3', 'Nc6']
+    const analysis = analyzeMoves(moves)
+
+    expect(setMoveAtPly(moves, analysis, 1, 'c5')).toEqual([
+      'e4',
+      'c5',
+      'Nf3',
+      'Nc6',
+    ])
+  })
+
+  it('appends a move at the end of the game', () => {
+    const moves = ['e4']
+    const analysis = analyzeMoves(moves)
+
+    expect(setMoveAtPly(moves, analysis, 1, 'e5')).toEqual(['e4', 'e5'])
+  })
+
+  it('builds SAN from a legal board move', () => {
+    expect(moveSanFromFen(START_FEN, 'e2', 'e4')).toBe('e4')
+    expect(moveSanFromFen(START_FEN, 'e2', 'e5')).toBeNull()
   })
 })
 

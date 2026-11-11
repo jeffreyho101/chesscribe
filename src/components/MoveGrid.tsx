@@ -3,7 +3,7 @@ import type { Analysis } from '../game'
 interface MoveGridProps {
   moves: string[]
   analysis: Analysis
-  selected: number | null
+  activeIndex: number | null
   onMovesChange: (moves: string[]) => void
   onSelect: (index: number) => void
 }
@@ -11,7 +11,7 @@ interface MoveGridProps {
 export function MoveGrid({
   moves,
   analysis,
-  selected,
+  activeIndex,
   onMovesChange,
   onSelect,
 }: MoveGridProps) {
@@ -28,7 +28,10 @@ export function MoveGrid({
     <section className="move-grid-panel" aria-label="Editable moves">
       <div className="move-grid-heading">
         <h2>Moves</h2>
-        <p className="hint">Red moves are illegal or could not be parsed.</p>
+        <p className="hint">
+          Red moves are illegal, ambiguous, or could not be parsed. Drag pieces on the
+          board to add or replace the next move.
+        </p>
       </div>
 
       <div className="move-grid">
@@ -50,7 +53,7 @@ export function MoveGrid({
                 label={`White move ${row + 1}`}
                 moves={moves}
                 analysis={analysis}
-                selected={selected}
+                activeIndex={activeIndex}
                 onChange={setMove}
                 onSelect={onSelect}
               />
@@ -59,7 +62,7 @@ export function MoveGrid({
                 label={`Black move ${row + 1}`}
                 moves={moves}
                 analysis={analysis}
-                selected={selected}
+                activeIndex={activeIndex}
                 onChange={setMove}
                 onSelect={onSelect}
               />
@@ -94,7 +97,7 @@ interface MoveCellProps {
   label: string
   moves: string[]
   analysis: Analysis
-  selected: number | null
+  activeIndex: number | null
   onChange: (index: number, value: string) => void
   onSelect: (index: number) => void
 }
@@ -104,7 +107,7 @@ function MoveCell({
   label,
   moves,
   analysis,
-  selected,
+  activeIndex,
   onChange,
   onSelect,
 }: MoveCellProps) {
@@ -116,7 +119,7 @@ function MoveCell({
     <input
       type="text"
       className={`move-input${illegal ? ' illegal' : ''}${
-        selected === index ? ' selected' : ''
+        activeIndex === index ? ' active' : ''
       }`}
       value={value}
       aria-label={label}

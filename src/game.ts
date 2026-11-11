@@ -45,6 +45,61 @@ export function normalizeSan(raw: string): string {
   return san
 }
 
+export function moveIndexAtPly(analysis: Analysis, ply: number): number | null {
+  if (ply <= 0) return null
+
+  const index = analysis.results.findIndex(
+    (result) => result.legal && !result.empty && result.acceptedAfter === ply,
+  )
+  return index === -1 ? null : index
+}
+
+export function moveIndexForNextPly(analysis: Analysis, ply: number): number {
+  const existing = moveIndexAtPly(analysis, ply + 1)
+  if (existing !== null) return existing
+
+  if (ply <= 0) {
+    const first = analysis.results.findIndex((result) => !result.empty)
+    return first === -1 ? 0 : first
+  }
+
+  let index = 0
+  for (let resultIndex = 0; resultIndex < analysis.results.length; resultIndex++) {
+    const result = analysis.results[resultIndex]
+    if (result.legal && !result.empty && result.acceptedAfter <= ply) {
+      index = resultIndex + 1
+    }
+  }
+  return index
+}
+
+export function setMoveAtPly(
+  moves: readonly string[],
+  analysis: Analysis,
+  ply: number,
+  san: string,
+): string[] {
+  const index = moveIndexForNextPly(analysis, ply)
+  const next = moves.slice()
+  while (next.length <= index) next.push('')
+  next[index] = san
+  return next
+}
+
+export function moveSanFromFen(
+  fen: string,
+  from: string,
+  to: string,
+  promotion = 'q',
+): string | null {
+  try {
+    const move = new Chess(fen).move({ from, to, promotion })
+    return move?.san ?? null
+  } catch {
+    return null
+  }
+}
+
 export function analyzeMoves(moves: readonly string[]): Analysis {
   const chess = new Chess()
   const fens = [chess.fen()]

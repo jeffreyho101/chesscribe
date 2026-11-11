@@ -459,8 +459,14 @@ p {
   font-weight: 700;
 }
 
-.move-input.selected {
-  box-shadow: inset 0 0 0 2px rgba(31, 111, 92, 0.28);
+.move-input.active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px rgba(31, 111, 92, 0.3);
+}
+
+.move-input.active.illegal {
+  border-color: var(--danger-line);
+  box-shadow: inset 0 0 0 2px rgba(180, 35, 24, 0.3);
 }
 
 .move-grid-actions {

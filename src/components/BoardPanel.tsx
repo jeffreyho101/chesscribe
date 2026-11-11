@@ -1,15 +1,34 @@
-import { Chessboard } from 'react-chessboard'
+import { Chessboard, type PieceDropHandlerArgs } from 'react-chessboard'
+import { moveSanFromFen } from '../game'
 
 interface BoardPanelProps {
   fens: string[]
   ply: number
   onPlyChange: (ply: number) => void
+  onMove: (san: string) => void
+  disabled?: boolean
 }
 
-export function BoardPanel({ fens, ply, onPlyChange }: BoardPanelProps) {
+export function BoardPanel({
+  fens,
+  ply,
+  onPlyChange,
+  onMove,
+  disabled = false,
+}: BoardPanelProps) {
   const last = Math.max(0, fens.length - 1)
   const current = Math.max(0, Math.min(ply, last))
   const fen = fens[current] ?? fens[0]
+
+  function handlePieceDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs) {
+    if (disabled || !targetSquare) return false
+
+    const san = moveSanFromFen(fen, sourceSquare, targetSquare)
+    if (!san) return false
+
+    onMove(san)
+    return true
+  }
 
   return (
     <section className="board-panel" aria-label="Board and move stepper">
@@ -17,9 +36,10 @@ export function BoardPanel({ fens, ply, onPlyChange }: BoardPanelProps) {
         <Chessboard
           options={{
             position: fen,
-            allowDragging: false,
+            allowDragging: !disabled,
             showNotation: true,
             animationDurationInMs: 160,
+            onPieceDrop: handlePieceDrop,
           }}
         />
       </div>
